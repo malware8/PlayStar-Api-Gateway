@@ -1,7 +1,10 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
+	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/malware8/PlayStar-Api-Gateway/pkg/repository"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -11,12 +14,22 @@ func main() {
 	logrus.SetFormatter(new(logrus.JSONFormatter))
 
 	if err := initConfigs(); err != nil {
-		logrus.Fatal("Configuration initialization failed")
+		logrus.Fatalf("Configuration initialization failed. Error: %s", err.Error())
 	}
 
-	engine := gin.Default()
+	if err := godotenv.Load(); err != nil {
+		logrus.Fatalf("Environment variables loading failed. Error: %s", err.Error())
+	}
 
-	authSvc := *auth.
+	repository := repository.Repository{}
+
+	repository.NewConnection(
+		viper.GetString("postgres.host"),
+		viper.GetString("postgres.port"),
+		viper.GetString("postgres.username"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		viper.GetString("postgres.dbname"),
+	)
 
 }
 
